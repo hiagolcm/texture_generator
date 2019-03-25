@@ -1,37 +1,37 @@
 import math
 import random
 
-from PIL import Image
+from PIL import Image, ImageDraw
 
-from tools.shape_generator import ShapeGenerator
+from src.helpers.math_helper import MathHelper
+from src.tools.shape_generator import ShapeGenerator
 
 
 class Agglomerator:
     CANVAS_SIZE = (800, 800)
 
     @staticmethod
-    def __draw_shape(canvas, shape, mean_distance, reference_position=None):
-        if reference_position is not None:
-            degree_from_reference = 2 * math.pi * random.random()
-            x_position = math.floor(math.cos(degree_from_reference) * mean_distance) + reference_position[0]
-            y_position = math.floor(math.sin(degree_from_reference) * mean_distance) + reference_position[1]
-            canvas.paste(shape, (x_position, y_position), shape)
-            return x_position, y_position
-        else:
-            canvas_w, canvas_h = canvas.size
-            x_position = math.floor(random.randrange(0, canvas_w))
-            y_position = math.floor(random.randrange(0, canvas_h))
-            canvas.paste(shape, (x_position, y_position), shape)
-            return x_position, y_position
+    def generate_agglomeration(number_of_islands, island_radius, shapes_per_island, number_of_points_in_shape,
+                              shape_radius, noise=0.0, show_islands=True):
+        number_of_islands_with_noise = round(MathHelper.apply_noise(number_of_islands, noise))  # apply noise
 
-    @staticmethod
-    def generate_aglomeration(shapes_per_island, number_of_points_in_shape, mean_distance, number_of_islands, shape_scale,  rotation, noise=0.0):
         canvas = Image.new('RGB', Agglomerator.CANVAS_SIZE, (255, 255, 255))
+        draw = ImageDraw.Draw(canvas)
 
-        for i in range(0, number_of_islands):
-            reference_position = None
-            for j in range(0, shapes_per_island):
-                shape = ShapeGenerator.create_shape(shape_scale, number_of_points_in_shape, noise).rotate(rotation)
-                reference_position = Agglomerator.__draw_shape(canvas, shape, mean_distance, reference_position)
+        for i in range(0, number_of_islands_with_noise):
+            canvas_w, canvas_h = canvas.size
+            island_position = (round(random.randrange(0, canvas_w)), round(random.randrange(0, canvas_h)))
+
+            shapes_per_island_with_noise = round(MathHelper.apply_noise(shapes_per_island, noise))  # apply noise
+
+            for j in range(0, shapes_per_island_with_noise):
+                island_radius_with_noise = round(MathHelper.apply_noise(island_radius, noise))  # apply noise
+                ShapeGenerator.draw_shape(draw, island_position, island_radius_with_noise, shape_radius,
+                                          number_of_points_in_shape, noise)
+
+            if show_islands:
+                draw.ellipse((island_position[0] - island_radius, island_position[1] - island_radius,
+                             island_position[0] + island_radius, island_position[1] + island_radius),
+                             outline=(255, 0, 0))
 
         return canvas

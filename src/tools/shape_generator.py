@@ -1,21 +1,20 @@
-from PIL import Image, ImageDraw
+import random
 
-from helpers.math_helper import MathHelper
+from src.helpers.math_helper import MathHelper
 
 
 class ShapeGenerator:
     FILL = (0, 0, 0)
 
     @staticmethod
-    def __create_empty_canvas(canvas_size):
-        return Image.new('RGBA', canvas_size, (255, 255, 255, 1))
+    def draw_shape(draw, position, island_radius, shape_radius, number_of_points, noise=0):
+        while True:
+            x = random.randrange(position[0] - island_radius, position[0] + island_radius)
+            y = random.randrange(position[1] - island_radius, position[1] + island_radius)
 
-    @staticmethod
-    def create_shape(canvas_size, number_of_points, degree_noise=0):
-        canvas = ShapeGenerator.__create_empty_canvas(canvas_size)
-        draw = ImageDraw.Draw(canvas)
-        points = MathHelper.get_equally_spaced_points(canvas_size, number_of_points, noise=degree_noise)
+            if MathHelper.get_euclidean_distance((x, y), position) <= island_radius:
+                break
+
+        points = MathHelper.get_polygon((x, y), shape_radius, number_of_points, noise=noise)
 
         draw.polygon(points, fill=(0, 0, 0))
-        return canvas
-
