@@ -31,4 +31,4 @@ Parameter | Description
 `shapes_per_island ` | Number of polygons by island
 `number_of_points_in_shape` | Number of vertices
 `shape_radius` | Polygon radius
-noise | noise applied to all variables
+`noise` | noise applied to all variables
