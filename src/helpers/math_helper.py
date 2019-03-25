@@ -27,3 +27,4 @@ class MathHelper:
     @staticmethod
     def apply_noise(x, noise):
         return x * numpy.random.normal(1, noise)
+
